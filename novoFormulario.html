@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #fff;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+      width: 30%;
+    }
+
+    .form-group-wide {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+      width: 100%;
+      text-align: center;
+    }
+
+    label {
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+
+    input[type="text"], input[type="email"], input[type="tel"], select, input[type="date"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      width: 200px;
+      background-color: #2055C5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #1A45A2;
+    }
+
+    @media (max-width: 800px) {
+      .form-group, .form-group-small {
+        width: 100%;
+      }
+
+      input[type="submit"] {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h3>Cadastro de Cliente - Feiras</h3>
+  <form id="cadastroCliente">
+
+    <div class="form-group">
+      <label for="feira">Feira:</label>
+      <input type="text" id="feira" name="feira" required>
+    </div>
+
+    <div class="form-group">
+      <label for="nome">Nome Completo:</label>
+      <input type="text" id="nome" name="nome" required>
+    </div>
+
+    <div class="form-group">
+      <label for="telefone">Telefone:</label>
+      <input type="tel" id="telefone" name="telefone" required 
+        title="Digite um telefone válido (ex: (xx)xxxx-xxxx ou (xx)9xxxx-xxxx)" 
+        oninput="formatarTelefone(this)">
+      <span id="erroTelefone" style="color: red; display: none;">Digite um telefone válido (ex: (xx)xxxx-xxxx ou (xx)9xxxx-xxxx)</span>
+    </div>
+
+    <div class="form-group">
+      <label for="cidade">Cidade:</label>
+      <input type="text" id="cidade" name="cidade" required>
+    </div>
+
+    <div class="form-group">
+      <label for="estado">Estado:</label>
+      <select id="estado" name="estado" required>
+        <option value="" disabled selected>Selecione um estado</option>
+        <option value="AC">AC - Acre</option>
+        <option value="AL">AL - Alagoas</option>
+        <option value="AP">AP - Amapá</option>
+        <option value="AM">AM - Amazonas</option>
+        <option value="BA">BA - Bahia</option>
+        <option value="CE">CE - Ceará</option>
+        <option value="DF">DF - Distrito Federal</option>
+        <option value="ES">ES - Espírito Santo</option>
+        <option value="GO">GO - Goiás</option>
+        <option value="MA">MA - Maranhão</option>
+        <option value="MT">MT - Mato Grosso</option>
+        <option value="MS">MS - Mato Grosso do Sul</option>
+        <option value="MG">MG - Minas Gerais</option>
+        <option value="PA">PA - Pará</option>
+        <option value="PB">PB - Paraíba</option>
+        <option value="PR">PR - Paraná</option>
+        <option value="PE">PE - Pernambuco</option>
+        <option value="PI">PI - Piauí</option>
+        <option value="RJ">RJ - Rio de Janeiro</option>
+        <option value="RN">RN - Rio Grande do Norte</option>
+        <option value="RS">RS - Rio Grande do Sul</option>
+        <option value="RO">RO - Rondônia</option>
+        <option value="RR">RR - Roraima</option>
+        <option value="SC">SC - Santa Catarina</option>
+        <option value="SP">SP - São Paulo</option>
+        <option value="SE">SE - Sergipe</option>
+        <option value="TO">TO - Tocantins</option>
+        <option value="EX">EX - Exterior</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="tipoProduto">Tipo de Produto:</label>
+      <select id="tipoProduto" name="tipoProduto" required>
+        <option value="" disabled selected>Selecione uma opção</option>
+        <option value="Transportador">Transportador</option>
+        <option value="Implemento Micro Trator">Implemento Micro Trator</option>
+        <option value="Implemento Quadriciclo">Implemento Quadriciclo</option>
+        <option value="Implemento Transportador">Implemento Transportador</option>
+        <option value="Peças">Peças</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="modeloTransportador">Modelo:</label>
+      <select id="modeloTransportador" name="modeloTransportador" required>
+        <!-- As opções de modelo serão preenchidas dinamicamente -->
+      </select>
+    </div>
+
+    <!-- Botão de Cadastrar -->
+    <div class="form-group-wide">
+      <input type="submit" id="submitBtn" value="Cadastrar">
+    </div>
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tipoProdutoSelect = document.getElementById('tipoProduto');
+      const modeloSelect = document.getElementById('modeloTransportador');
+
+      // Função para atualizar os modelos com base no tipo de produto selecionado
+      function atualizarModelosFeiras() {
+        const tipoProduto = tipoProdutoSelect.value;
+        modeloSelect.innerHTML = ''; // Limpa as opções atuais do modelo
+        versaoSelect.innerHTML = ''; // Limpa as opções atuais de versão
+
+        // Adiciona as opções de modelo conforme o tipo de produto
+        let opcoesModelos = [];
+        if (tipoProduto === 'Transportador') {
+          opcoesModelos = ['TAM1200', 'TAM1400', 'TM1500', 'TM2200', 'TM2500', 'TM3000'];
+        } else if (tipoProduto === 'Implemento Micro Trator') {
+          opcoesModelos = ['Aparador de Grama', 'Carreta Tracionada', 'Kit Direção', 'Kit Triturador', 'Roçadeira Frontal', 'Roçadeira Horizontal'];
+        } else if (tipoProduto === 'Implemento Quadriciclo') {
+          opcoesModelos = ['Carretinha', 'Distribuidor Adubo/Sementes', 'Grade de Disco', 'Lâmina Dianteira', 'Pulverizador', 'Roçadeira Horizontal', 'Roçadeira Vertical'];
+        } else if (tipoProduto === 'Implemento Transportador') {
+          opcoesModelos = ['Ensiladeira', 'Pulverizador', 'Triturador de Galhos'];
+        } else if (tipoProduto === 'Peças') {
+          opcoesModelos = ['Peças'];
+        }
+
+        // Popula o campo de modelos
+        opcoesModelos.forEach(function(modelo) {
+          const option = document.createElement('option');
+          option.value = modelo;
+          option.text = modelo;
+          modeloSelect.appendChild(option);
+        });
+
+        verificarExibicaoFlags(); // Atualiza as flags com a mudança do tipo
+      }
+
+      // Função para verificar e exibir/ocultar as flags
+      function verificarExibicaoFlags() {
+        const tipoProduto = tipoProdutoSelect.value;
+        const modeloSelecionado = modeloSelect.value;
+
+        if (tipoProduto === 'Transportador') {
+          flagsGroup.style.display = 'block';
+        } else {
+          flagsGroup.style.display = 'none';
+        }
+
+        if (tipoProduto === 'Implemento Micro Trator' && modeloSelecionado === 'Carreta Tracionada') {
+          flagsGroupC.style.display = 'block';
+        } else {
+          flagsGroupC.style.display = 'none';
+        }
+      }
+
+      tipoProdutoSelect.addEventListener('change', function() {
+        atualizarModelosFeiras();
+      });
+
+      modeloSelect.addEventListener('change', function() {
+        atualizarVersoesFeiras();
+        verificarExibicaoFlags();
+      });
+
+      atualizarModelosFeiras();
+      atualizarVersoesFeiras();
+    });
+  </script>
+</body>
+</html>
