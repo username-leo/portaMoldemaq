@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-image: url('https://i.imgur.com/wppSgkw.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      height: 100vh;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .logo {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 100px;
+      height: auto;
+      cursor: pointer;
+    }
+
+    h2 {
+      color: #000;
+      margin-top: 50px;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #2055C5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      width: 200px;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #1A45A2;
+    }
+
+    form {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      max-width: 700px;
+      width: 100%;
+      margin: 20px auto;
+      height: auto;
+    }
+
+    #mensagem {
+      font-size: 16px;
+      padding: 15px;
+      margin: 20px auto;
+      border-radius: 5px;
+      display: none;
+      max-width: 700px;
+      text-align: center;
+    }
+
+    .sucesso {
+      color: #3c763d;
+      background-color: #dff0d8;
+      border-color: #d6e9c6;
+    }
+
+    .erro {
+      color: #a94442;
+      background-color: #f2dede;
+      border-color: #ebccd1;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .loader {
+      border: 8px solid #f3f3f3;
+      border-top: 8px solid #2055C5;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 600px) {
+      form {
+        padding: 15px;
+      }
+
+      h2 {
+        font-size: 20px;
+      }
+
+      button {
+        width: 100%;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay adicionado no início do body -->
+  <div id="overlay" class="overlay" style="display: none;">
+    <div class="loader"></div>
+  </div>
+
+  <!-- Logotipo da empresa -->
+  <img src="https://i.imgur.com/8xPh3Dq.jpg" class="logo" alt="Logo da Empresa" onclick="voltarTelaInicial()">
+
+  <!-- Título principal -->
+  <h2>Bem-vindo ao Portal Moldemaq</h2>
+
+  <!-- Botão de Certificado de Garantia -->
+  <button id="botaoCadastro">Certificado de Garantia Moldemaq</button>
+
+  <!-- Loader (carregando) -->
+  <span id="loader" class="loading" style="display:none;"></span>
+
+  <!-- Conteúdo que será carregado -->
+  <div id="conteudo"></div>
+
+  <!-- Mensagem de erro ou sucesso movida para o final -->
+  <div id="mensagem"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Verifica se o botão de cadastro está presente antes de adicionar o evento
+      const botaoCadastro = document.getElementById("botaoCadastro");
+      if (botaoCadastro) {
+        botaoCadastro.onclick = function() {
+          document.getElementById('loader').style.display = 'inline-block';
+          botaoCadastro.style.display = 'none';
+
+          google.script.run
+            .withSuccessHandler(function(output) {
+              document.getElementById('conteudo').innerHTML = output;
+              document.getElementById('loader').style.display = 'none';
+
+              const form = document.getElementById('cadastroCliente');
+              if (form) {
+                const emailInput = document.createElement('input');
+                emailInput.type = 'hidden';
+                emailInput.id = 'usuarioEmail';
+                emailInput.name = 'usuarioEmail';
+                form.appendChild(emailInput);
+
+                // Captura o campo de CPF/CNPJ
+                const cpfInput = document.getElementById('cpf');
+                if (cpfInput) {
+                  // Permite apenas números durante a digitação
+                  cpfInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+                  });
+
+                  // Adiciona evento 'blur' para formatação apenas ao sair do campo
+                  cpfInput.addEventListener('blur', function() {
+                    formatarCPFCNPJ(this);
+                  });
+                }
+
+                // Captura o campo de CEP
+                const cepInput = document.getElementById('cep');
+                if (cepInput) {
+                  cepInput.addEventListener('blur', function() {
+                    formatarCEP(this);
+                  });
+                }
+
+                // Captura o campo de Telefone
+                const telefoneInput = document.getElementById('telefone');
+                if (telefoneInput) {
+                  telefoneInput.addEventListener('blur', function() {
+                    formatarTelefone(this);
+                  });
+                }
+
+                const tipoProdutoSelect = document.getElementById('tipoProduto');
+                const modeloSelect = document.getElementById('modeloTransportador');
+                const versaoSelect = document.getElementById('versao');
+                const flagsGroup = document.getElementById('flagsGroup');
+
+                // Adiciona o evento para atualizar os modelos ao mudar o tipo de produto
+                tipoProdutoSelect.addEventListener('change', function() {
+                  atualizarModelos();
+
+                  // Exibe as flags apenas quando o tipo de produto for "Transportador"
+                  if (tipoProdutoSelect.value === 'Transportador') {
+                    flagsGroup.style.display = 'block'; // Exibe as flags
+                  } else {
+                    flagsGroup.style.display = 'none'; // Oculta as flags
+                  }
+                });
+                
+                const flagsGroupC = document.getElementById('flagsGroupC');
+
+                modeloSelect.addEventListener('change', function() {
+                  atualizarVersoes();
+
+                  // Exibe as flags apenas quando o modelo de produto for "Carretinha Tracionada"
+                  if (tipoProdutoSelect.value === 'Implemento Micro Trator' && modeloSelect.value === 'Carreta Tracionada') {
+                    flagsGroupC.style.display = 'block'; // Exibe as flags
+                  } else {
+                    flagsGroupC.style.display = 'none'; // Oculta as flags
+                  }
+                });
+
+                // Adiciona o evento para atualizar as versões ao mudar o modelo
+                modeloSelect.addEventListener('change', atualizarVersoes);
+
+                // Função para atualizar o campo de modelo com base no tipo de produto selecionado
+                function atualizarModelos() {
+                  modeloSelect.innerHTML = ''; // Limpa o campo de modelos
+                  versaoSelect.innerHTML = ''; // Limpa o campo de versões
+                  const tipoProduto = tipoProdutoSelect.value;
+
+                  if (tipoProduto === 'Transportador') {
+                    const opcoesTransportador = ['TAM1200', 'TAM1400', 'TM1500', 'TM2200', 'TM2500', 'TM3000'];
+                    opcoesTransportador.sort(function(a, b) { return a.localeCompare(b); });
+                    opcoesTransportador.forEach(function(modelo) {
+                      const option = document.createElement('option');
+                      option.value = modelo;
+                      option.text = modelo;
+                      modeloSelect.appendChild(option);
+                    });
+                  } else if (tipoProduto === 'Implemento Micro Trator') {
+                    const opcoesMicroTrator = ['Carreta Tracionada', 'Kit Direção', 'Aparador de Grama', 'Roçadeira Frontal', 'Roçadeira Horizontal', 'Kit Triturador'];
+                    opcoesMicroTrator.sort(function(a, b) { return a.localeCompare(b); });
+                    opcoesMicroTrator.forEach(function(modelo) {
+                      const option = document.createElement('option');
+                      option.value = modelo;
+                      option.text = modelo;
+                      modeloSelect.appendChild(option);
+                    });
+                  } else if (tipoProduto === 'Implemento Quadriciclo') {
+                    const opcoesQuadriciclo = ['Roçadeira Vertical', 'Roçadeira Horizontal', 'Grade de Disco', 'Carretinha', 'Pulverizador', 'Distribuidor Adubo/Sementes', 'Lâmina Dianteira'];
+                    opcoesQuadriciclo.sort(function(a, b) { return a.localeCompare(b); });
+                    opcoesQuadriciclo.forEach(function(modelo) {
+                      const option = document.createElement('option');
+                      option.value = modelo;
+                      option.text = modelo;
+                      modeloSelect.appendChild(option);
+                    });
+                  } else if (tipoProduto === 'Implemento Transportador') {
+                    const opcoesTransportador = ['Triturador de Galhos', 'Ensiladeira', 'Pulverizador'];
+                    opcoesTransportador.sort(function(a, b) { return a.localeCompare(b); });
+                    opcoesTransportador.forEach(function(modelo) {
+                      const option = document.createElement('option');
+                      option.value = modelo;
+                      option.text = modelo;
+                      modeloSelect.appendChild(option);
+                    });
+                  } else if (tipoProduto === 'Peças') {
+                    const option = document.createElement('option');
+                    option.value = 'Peças';
+                    option.text = 'Peças';
+                    modeloSelect.appendChild(option);
+                  }
+
+                  // Atualiza as versões de acordo com o modelo inicial selecionado
+                  atualizarVersoes();
+                }
+
+                // Função para atualizar o campo de versão com base no modelo selecionado
+                function atualizarVersoes() {
+                  versaoSelect.innerHTML = ''; // Limpa o campo de versões
+                  const modeloSelecionado = modeloSelect.value;
+
+                  let opcoesVersoes = [];
+                  // TRANSPORTADORES
+                  if (modeloSelecionado === 'TAM1200') {
+                    opcoesVersoes = ['Auto', 'Baixo', 'Cafeeiro'];
+                  } else if (modeloSelecionado === 'TAM1400') {
+                    opcoesVersoes = ['Auto', 'Baixo', 'Cafeeiro'];
+                  } else if (modeloSelecionado === 'TM1500') {
+                    opcoesVersoes = ['Auto Basculante', 'Reduzido Auto ou Baixo', 'Reduzido Fixo', 'Fixo'];
+                  } else if (modeloSelecionado === 'TM2200') {
+                    opcoesVersoes = ['Reduzida com TDP', 'Reduzida sem TDP'];
+                  } else if (modeloSelecionado === 'TM2500') {
+                    opcoesVersoes = ['Reduzida com TDP', 'Reduzida sem TDP'];
+                  } else if (modeloSelecionado === 'TM3000') {
+                    opcoesVersoes = ['Cabinada', 'Coletor de Lixo', 'Reduzida com TDP', 'Reduzida sem TDP', 'Sem Reduzida'];
+                  }
+
+                  // IMPLEMENTO DE MICRO TRATOR
+                  else if (modeloSelecionado === 'Aparador de Grama') {
+                    opcoesVersoes = ['Aparador de Grama'];
+                  } else if (modeloSelecionado === 'Carreta Tracionada') {
+                    opcoesVersoes = ['Basculante', 'Basculante Baixa Entre Rodas', 'Basculante Baixa Graneleira Cafe', 
+                                    'Basculante Baixa Graneleira Forrageira', 'Basculante Bananeira', 'Basculante Hidraulica Baixa', 
+                                    'Basculante Hidraulica Graneleira Cafe', 'Basculante Hidraulico', 'Basculante Manual', 
+                                    'Basculante Manual Baixa Forrageira', 'Basculante Manual Bananeira', 'Fixa'];
+                  } else if (modeloSelecionado === 'Kit Direção') {
+                    opcoesVersoes = ['Kit Direção'];
+                  } else if (modeloSelecionado === 'Kit Triturador') {
+                    opcoesVersoes = ['Kit Triturador'];
+                  } else if (modeloSelecionado === 'Roçadeira Frontal') {
+                    opcoesVersoes = ['Roçadeira Frontal'];
+                  } else if (modeloSelecionado === 'Roçadeira Horizontal') {
+                    opcoesVersoes = ['Roçadeira Horizontal'];
+                  }
+
+                  // IMPLEMENTO QUADRICICLO
+                  else if (modeloSelecionado === 'Carretinha') {
+                    opcoesVersoes = ['Carretinha'];
+                  } else if (modeloSelecionado === 'Distribuidor Adubo/Sementes') {
+                    opcoesVersoes = ['Distribuidor Adubo/Sementes'];
+                  } else if (modeloSelecionado === 'Grade de Disco') {
+                    opcoesVersoes = ['Grade de Disco'];
+                  } else if (modeloSelecionado === 'Lâmina Dianteira') {
+                    opcoesVersoes = ['Lâmina Dianteira'];
+                  } else if (modeloSelecionado === 'Pulverizador') {
+                    opcoesVersoes = ['Pulverizador'];
+                  } else if (modeloSelecionado === 'Roçadeira Horizontal') {
+                    opcoesVersoes = ['Roçadeira Horizontal'];
+                  } else if (modeloSelecionado === 'Roçadeira Vertical') {
+                    opcoesVersoes = ['Roçadeira Vertical'];
+                  }
+
+                  // IMPLEMENTO TRANSPORTADOR
+                  else if (modeloSelecionado === 'Ensiladeira') {
+                    opcoesVersoes = ['Ensiladeira'];
+                  } else if (modeloSelecionado === 'Triturador de Galhos') {
+                    opcoesVersoes = ['Triturador de Galhos'];
+                  }
+
+                  // PEÇAS
+                  else if (modeloSelecionado === 'Peças') {
+                    opcoesVersoes = ['Peças'];
+                  }
+
+
+                  // Popula o campo de versões
+                  opcoesVersoes.forEach(function(versao) {
+                    const option = document.createElement('option');
+                    option.value = versao;
+                    option.text = versao;
+                    versaoSelect.appendChild(option);
+                  });
+                }
+
+                // Inicializa os modelos e versões ao carregar a página
+                atualizarModelos();
+
+                google.script.run.withSuccessHandler(function(email) {
+                  if (emailInput) {
+                    emailInput.value = email;
+                  }
+                }).getActiveUserEmail();
+
+                form.onsubmit = function(event) {
+                  return enviarFormulario(event);
+                };
+              }
+            })
+            .withFailureHandler(function(error) {
+              document.getElementById('loader').style.display = 'none';
+              console.error('Erro ao carregar o formulário:', error.message);
+            })
+            .abrirFormulario();
+        };
+      } else {
+        console.error("Botão 'botaoCadastro' não encontrado.");
+      }
+    });
+
+    // Função para formatar CPF/CNPJ ao sair do campo
+    function formatarCPFCNPJ(input) {
+      let valor = input.value.replace(/\D/g, ''); // Remove caracteres não numéricos
+
+      // Formatação para CPF (11 dígitos)
+      if (valor.length === 11) {
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d)/, '$1.$2');
+        valor = valor.replace(/(\d{3})(\d{2})$/, '$1-$2');
+      } 
+      // Formatação para CNPJ (14 dígitos)
+      else if (valor.length === 14) {
+        valor = valor.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+      }
+
+      // Atualiza o valor do campo
+      input.value = valor;
+
+      // Validação para CPF ou CNPJ
+      const somenteNumeros = valor.replace(/\D/g, '');
+      if (somenteNumeros.length !== 11 && somenteNumeros.length !== 14) {
+        input.setCustomValidity('Por favor, insira um CPF com 11 dígitos ou um CNPJ com 14 dígitos.');
+      } else {
+        input.setCustomValidity('');
+      }
+    }
+
+    // Função para formatar CEP ao sair do campo
+    function formatarCEP(cepInput) {
+      const cep = cepInput.value.replace(/\D/g, '');
+      cepInput.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
+    }
+
+    /*// Função para formatar Telefone ao sair do campo
+    function formatarTelefone(telefoneInput) {
+      const telefone = telefoneInput.value.replace(/\D/g, '');
+
+      if (telefone.length <= 10) {
+        telefoneInput.value = telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1)$2-$3');
+      } else {
+        telefoneInput.value = telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1)$2-$3');
+      }
+    }*/
+
+    function formatarTelefone(campo) {
+      let valor = campo.value.replace(/\D/g, ""); // Remove tudo que não for número
+      let erroMsg = document.getElementById("erroTelefone");
+        if (valor.length > 11) {
+          // Se tiver mais de 11 dígitos, remove a formatação e mantém apenas números
+          campo.value = valor;
+          erroMsg.style.display = "none"; // Oculta a mensagem de erro
+        } else if (valor.length === 11) {
+          // Formato para celulares (11 dígitos): (XX)9XXXX-XXXX
+          campo.value = `(${valor.substring(0, 2)})${valor.substring(2, 7)}-${valor.substring(7)}`;
+          erroMsg.style.display = "none"; // Oculta a mensagem de erro
+        } else if (valor.length === 10) {
+          // Formato para telefones fixos (10 dígitos): (XX)XXXX-XXXX
+          campo.value = `(${valor.substring(0, 2)})${valor.substring(2, 6)}-${valor.substring(6)}`;
+          erroMsg.style.display = "none"; // Oculta a mensagem de erro
+        } else {
+          // Se não atingir 10 dígitos, exibe a mensagem de erro
+          erroMsg.style.display = "inline";
+        }
+      }
+
+    function voltarTelaInicial() {
+      document.getElementById('conteudo').innerHTML = '';
+      const botaoCadastro = document.getElementById('botaoCadastro');
+      if (botaoCadastro) {
+        botaoCadastro.style.display = 'inline-block';
+      }
+      document.getElementById('mensagem').style.display = 'none';
+    }
+
+    function enviarFormulario(e) {
+      e.preventDefault();
+
+      mostrarOverlay();  // Ativa o overlay
+
+      const form = document.getElementById('cadastroCliente');
+      if (!form) {
+        console.error("Formulário não encontrado.");
+        return;
+      }
+
+      const nomeRevenda = form['nomeRevenda'].value;
+      const nome = form['nome'].value;
+      const email = form['email'].value;
+      const telefone = form['telefone'].value;
+      const tipoProduto = form['tipoProduto'].value;
+      const modeloTransportador = form['modeloTransportador'].value;
+      const versao = form['versao'].value;
+      const notaFiscal = form['notaFiscal'].value;
+      const numeroSerie = form['numeroSerie'].value;
+      const cpf = form['cpf'].value;
+      const dataEntregaTecnica = form['dataEntregaTecnica'].value;
+      const dataFaturamento = form['dataFaturamento'].value;
+      const cep = form['cep'].value;
+      const rua = form['rua'].value;
+      const numero = form['numero'].value;
+      const bairro = form['bairro'].value;
+      const cidade = form['cidade'].value;
+      const estado = form['estado'].value;
+      const usuarioEmail = form['usuarioEmail'].value;
+      const entregaFeitaPor = form['entregaFeitaPor'].value;
+
+      // Captura os valores das checkboxes das flags marcadas
+      const flags = [];
+      if (form['paraBrisa'].checked) flags.push('Para-brisa');
+      if (form['laminaFrontal'].checked) flags.push('Lâmina Frontal');
+      if (form['sobreTampa'].checked) flags.push('Sobre Tampa');
+      if (form['kitEstepe'].checked) flags.push('Kit Estepe');
+      if (form['kitSinalizacao'].checked) flags.push('Kit Sinalização');
+      if (form['triturador'].checked) flags.push('Triturador');
+      if (form['direcaoHidraulica'].checked) flags.push('Direção Hidráulica');
+      if (form['yanmar'].checked) flags.push('Yanmar'); // Adicionando Yanmar
+      if (form['kubota'].checked) flags.push('Kubota'); // Adicionando Kubota
+
+      const flagsConcatenadas = flags.join(', ');  // Concatena os valores em uma string separada por vírgula
+
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          esconderOverlay();  // Esconde o overlay após a resposta
+          if (result.startsWith("Erro")) {
+            exibirMensagem(result, 'erro');
+          } else {
+            exibirMensagem('Certificado emitido com sucesso!', 'sucesso');
+            const nomeArquivo = `Certificado_${nome}_${modeloTransportador}_${nomeRevenda}.pdf`;
+            const link = document.createElement('a');
+            link.href = 'data:application/pdf;base64,' + result;
+            link.download = nomeArquivo;
+            link.click();
+
+            // Limpa todos os campos do formulário após sucesso
+            form.reset();
+
+            // Limpa as opções do campo "Modelo" e "Versão"
+            const modeloSelect = document.getElementById('modeloTransportador');
+            const versaoSelect = document.getElementById('versao');
+            modeloSelect.innerHTML = '<option value="" disabled selected>Selecione o modelo</option>';
+            versaoSelect.innerHTML = '<option value="" disabled selected>Selecione a versão</option>';
+
+            // Desmarca todas as checkboxes de flags
+            const flagsGroup = document.getElementById('flagsGroup');
+            const flagsGroupC = document.getElementById('flagsGroupC');
+            const checkboxes = flagsGroup.querySelectorAll('input[type="checkbox"]');
+            const checkboxesC = flagsGroupC.querySelectorAll('input[type="checkboxC"]');
+            checkboxes.forEach(checkbox => checkbox.checked = false);
+            checkboxesC.forEach(checkboxC => checkboxC.checked = false);
+
+            // Oculta o grupo de flags
+            flagsGroup.style.display = 'none';
+            flagsGroupC.style.display = 'none';
+          }
+        })
+        .withFailureHandler(function(error) {
+          esconderOverlay();  // Esconde o overlay em caso de erro
+          exibirMensagem('Erro ao realizar o cadastro: ' + error.message, 'erro');
+        })
+        .salvarDados(
+          nomeRevenda,
+          nome,
+          email,
+          telefone,
+          tipoProduto,
+          modeloTransportador,
+          versao,
+          flagsConcatenadas,
+          notaFiscal,
+          numeroSerie,
+          cpf,
+          dataEntregaTecnica,
+          dataFaturamento,
+          cep,
+          rua,
+          numero,
+          bairro,
+          cidade,
+          estado,
+          usuarioEmail,
+          entregaFeitaPor
+        );
+
+      return false;
+    }
+
+    function exibirMensagem(mensagem, tipo) {
+      var mensagemDiv = document.getElementById('mensagem');
+      mensagemDiv.className = tipo === 'sucesso' ? 'sucesso' : 'erro';
+      mensagemDiv.innerHTML = mensagem;
+      mensagemDiv.style.display = 'block';
+
+      setTimeout(function() {
+        mensagemDiv.style.display = 'none';
+      }, 10000);
+    }
+
+    function mostrarOverlay() {
+      document.getElementById('overlay').style.display = 'flex';
+    }
+
+    function esconderOverlay() {
+      document.getElementById('overlay').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
