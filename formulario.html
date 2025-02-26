@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #fff;
+      max-width: 1200px;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+      width: 30%;
+    }
+
+    .form-group-wide {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+      width: 100%;
+      text-align: center;
+    }
+
+    label {
+      margin-bottom: 5px;
+      font-size: 16px;
+    }
+
+    input[type="text"], input[type="email"], input[type="tel"], select, input[type="date"] {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      width: 200px;
+      background-color: #2055C5;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #1A45A2;
+    }
+
+    @media (max-width: 800px) {
+      .form-group, .form-group-small {
+        width: 100%;
+      }
+
+      input[type="submit"] {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h3>Cadastro de Cliente</h3>
+  <form id="cadastroCliente">
+    <!-- Primeira linha -->
+    <div class="form-group">
+      <label for="nomeRevenda">Nome da Revenda:</label>
+      <input type="text" id="nomeRevenda" name="nomeRevenda" required>
+    </div>
+
+    <div class="form-group">
+      <label for="nome">Nome Completo:</label>
+      <input type="text" id="nome" name="nome" required>
+    </div>
+
+    <div class="form-group">
+      <label for="cpf">CPF/CNPJ:</label>
+      <input type="text" id="cpf" name="cpf" required maxlength="18" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}|\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}" title="Digite um CPF (xxx.xxx.xxx-xx) ou CNPJ (xx.xxx.xxx/xxxx-xx) válido">
+    </div>
+
+    <!-- Segunda linha -->
+    <div class="form-group">
+      <label for="email">E-mail:</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+
+    <!--formatação de telefone antigo
+    <div class="form-group">
+      <label for="telefone">Telefone:</label>
+      <input type="tel" id="telefone" name="telefone" pattern="\(\d{2}\)\d{4,5}-\d{4}" title="Digite um telefone válido (ex: (xx)xxxx-xxxx ou (xx)9xxxx-xxxx)" required>
+    </div>-->
+
+    <div class="form-group">
+      <label for="telefone">Telefone:</label>
+      <input type="tel" id="telefone" name="telefone" required 
+        title="Digite um telefone válido (ex: (xx)xxxx-xxxx ou (xx)9xxxx-xxxx)" 
+        oninput="formatarTelefone(this)">
+      <span id="erroTelefone" style="color: red; display: none;">Digite um telefone válido (ex: (xx)xxxx-xxxx ou (xx)9xxxx-xxxx)</span>
+    </div>
+
+    <div class="form-group">
+      <label for="dataEntregaTecnica">Data da Entrega Técnica:</label>
+      <input type="date" id="dataEntregaTecnica" name="dataEntregaTecnica" required>
+    </div>
+
+    <!-- Terceira linha -->
+    <div class="form-group">
+      <label for="cep">CEP:</label>
+      <input type="text" id="cep" name="cep" pattern="\d{5}-\d{3}" title="Digite um CEP válido (ex: 12345-678)" required>
+    </div>
+
+    <div class="form-group">
+      <label for="rua">Rua:</label>
+      <input type="text" id="rua" name="rua" required>
+    </div>
+
+    <div class="form-group">
+      <label for="numero">Número:</label>
+      <input type="text" id="numero" name="numero" required>
+    </div>
+
+    <!-- Quarta linha -->
+    <div class="form-group">
+      <label for="bairro">Bairro:</label>
+      <input type="text" id="bairro" name="bairro" required>
+    </div>
+
+    <div class="form-group">
+      <label for="cidade">Cidade:</label>
+      <input type="text" id="cidade" name="cidade" required>
+    </div>
+
+    <div class="form-group">
+      <label for="estado">Estado:</label>
+      <select id="estado" name="estado" required>
+        <option value="" disabled selected>Selecione um estado</option>
+        <option value="AC">AC - Acre</option>
+        <option value="AL">AL - Alagoas</option>
+        <option value="AP">AP - Amapá</option>
+        <option value="AM">AM - Amazonas</option>
+        <option value="BA">BA - Bahia</option>
+        <option value="CE">CE - Ceará</option>
+        <option value="DF">DF - Distrito Federal</option>
+        <option value="ES">ES - Espírito Santo</option>
+        <option value="GO">GO - Goiás</option>
+        <option value="MA">MA - Maranhão</option>
+        <option value="MT">MT - Mato Grosso</option>
+        <option value="MS">MS - Mato Grosso do Sul</option>
+        <option value="MG">MG - Minas Gerais</option>
+        <option value="PA">PA - Pará</option>
+        <option value="PB">PB - Paraíba</option>
+        <option value="PR">PR - Paraná</option>
+        <option value="PE">PE - Pernambuco</option>
+        <option value="PI">PI - Piauí</option>
+        <option value="RJ">RJ - Rio de Janeiro</option>
+        <option value="RN">RN - Rio Grande do Norte</option>
+        <option value="RS">RS - Rio Grande do Sul</option>
+        <option value="RO">RO - Rondônia</option>
+        <option value="RR">RR - Roraima</option>
+        <option value="SC">SC - Santa Catarina</option>
+        <option value="SP">SP - São Paulo</option>
+        <option value="SE">SE - Sergipe</option>
+        <option value="TO">TO - Tocantins</option>
+        <option value="EX">EX - Exterior</option>
+      </select>
+    </div>
+
+    <!-- Quinta linha -->
+    <div class="form-group">
+      <label for="dataFaturamento">Data do Faturamento:</label>
+      <input type="date" id="dataFaturamento" name="dataFaturamento" required>
+    </div>
+
+    <div class="form-group">
+      <label for="notaFiscal">Documento:</label>
+      <input type="text" id="notaFiscal" name="notaFiscal" required>
+    </div>
+
+    <div class="form-group">
+      <label for="tipoProduto">Tipo de Produto:</label>
+      <select id="tipoProduto" name="tipoProduto" required>
+        <option value="" disabled selected>Selecione uma opção</option>
+        <option value="Transportador">Transportador</option>
+        <option value="Implemento Micro Trator">Implemento Micro Trator</option>
+        <option value="Implemento Quadriciclo">Implemento Quadriciclo</option>
+        <option value="Implemento Transportador">Implemento Transportador</option>
+        <option value="Peças">Peças</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="modeloTransportador">Modelo:</label>
+      <select id="modeloTransportador" name="modeloTransportador" required>
+        <!-- As opções de modelo serão preenchidas dinamicamente -->
+      </select>
+    </div>
+
+    <!-- Campo "Versão" -->
+    <div class="form-group">
+      <label for="versao">Versão:</label>
+      <select id="versao" name="versao" required>
+        <!-- As opções de modelo serão preenchidas dinamicamente -->
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="numeroSerie">Nº Série:</label>
+      <input type="text" id="numeroSerie" name="numeroSerie" required>
+    </div>
+
+    <div class="form-group">
+      <label for="entregaFeitaPor">Entrega feita por:</label>
+      <input type="text" id="entregaFeitaPor" name="entregaFeitaPor" placeholder="Nome do entregador" 
+             title="Nome do entregador técnico que fez a entrega" required>
+    </div>
+
+    <!-- Grupo de flags Transportador -->
+  <div class="flags-group" id="flagsGroup" style="display: none;">
+    <div class="flag-item">
+      <input type="checkbox" id="paraBrisa" name="paraBrisa">
+      <label for="paraBrisa">Para-brisa</label>
+    </div>
+    <div class="flag-item">
+      <input type="checkbox" id="laminaFrontal" name="laminaFrontal">
+      <label for="laminaFrontal">Lâmina Frontal</label>
+    </div>
+    <div class="flag-item">
+      <input type="checkbox" id="sobreTampa" name="sobreTampa">
+      <label for="sobreTampa">Sobre Tampa</label>
+    </div>
+    <div class="flag-item">
+      <input type="checkbox" id="kitEstepe" name="kitEstepe">
+      <label for="kitEstepe">Kit Estepe</label>
+    </div>
+    <div class="flag-item">
+      <input type="checkbox" id="kitSinalizacao" name="kitSinalizacao">
+      <label for="kitSinalizacao">Kit Sinalização</label>
+    </div>
+    <div class="flag-item">
+      <input type="checkbox" id="yanmar" name="yanmar">
+      <label for="yanmar">Yanmar</label>
+    </div>
+    <div class="flag-item">
+      <input type="checkbox" id="kubota" name="kubota">
+      <label for="kubota">Kubota</label>
+    </div>
+  </div>
+
+
+    <!-- Grupo de flags Carreta Tracionada -->
+    <div class="flags-groupC" id="flagsGroupC" style="display: none;">
+      <div class="flag-item">
+        <input type="checkbox" id="triturador" name="triturador">
+        <label for="triturador">Triturador</label>
+      </div>
+      <div class="flag-item">
+        <input type="checkbox" id="direcaoHidraulica" name="direcaoHidraulica">
+        <label for="direcaoHidraulica">Direção Hidraulica</label>
+      </div>
+    </div>
+
+    <!-- Botão de Cadastrar -->
+    <div class="form-group-wide">
+      <input type="submit" id="submitBtn" value="Cadastrar">
+    </div>
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tipoProdutoSelect = document.getElementById('tipoProduto');
+      const modeloSelect = document.getElementById('modeloTransportador');
+      const versaoSelect = document.getElementById('versao');
+      const flagsGroup = document.getElementById('flagsGroup'); // Flags do Transportador
+      const flagsGroupC = document.getElementById('flagsGroupC'); // Flags do Implemento Micro Trator - Carreta Tracionada
+
+      // Função para atualizar os modelos com base no tipo de produto selecionado
+      function atualizarModelos() {
+        const tipoProduto = tipoProdutoSelect.value;
+        modeloSelect.innerHTML = ''; // Limpa as opções atuais do modelo
+        versaoSelect.innerHTML = ''; // Limpa as opções atuais de versão
+
+        // Adiciona as opções de modelo conforme o tipo de produto
+        let opcoesModelos = [];
+        if (tipoProduto === 'Transportador') {
+          opcoesModelos = ['TAM1200', 'TAM1400', 'TM1500', 'TM2200', 'TM2500', 'TM3000'];
+        } else if (tipoProduto === 'Implemento Micro Trator') {
+          opcoesModelos = ['Aparador de Grama', 'Carreta Tracionada', 'Kit Direção', 'Kit Triturador', 'Roçadeira Frontal', 'Roçadeira Horizontal'];
+        } else if (tipoProduto === 'Implemento Quadriciclo') {
+          opcoesModelos = ['Carretinha', 'Distribuidor Adubo/Sementes', 'Grade de Disco', 'Lâmina Dianteira', 'Pulverizador', 'Roçadeira Horizontal', 'Roçadeira Vertical'];
+        } else if (tipoProduto === 'Implemento Transportador') {
+          opcoesModelos = ['Ensiladeira', 'Pulverizador', 'Triturador de Galhos'];
+        } else if (tipoProduto === 'Peças') {
+          opcoesModelos = ['Peças'];
+        }
+
+        // Popula o campo de modelos
+        opcoesModelos.forEach(function(modelo) {
+          const option = document.createElement('option');
+          option.value = modelo;
+          option.text = modelo;
+          modeloSelect.appendChild(option);
+        });
+
+        verificarExibicaoFlags(); // Atualiza as flags com a mudança do tipo
+      }
+
+      // Função para atualizar o campo de versão com base no modelo selecionado
+      function atualizarVersoes() {
+        const modeloSelecionado = modeloSelect.value;
+        versaoSelect.innerHTML = ''; // Limpa as opções atuais de versão
+
+        let opcoesVersoes = [];
+        if (modeloSelecionado === 'TAM1200') {
+          opcoesVersoes = ['Auto', 'Baixo', 'Cafeeiro'];
+        } else if(modeloSelecionado === 'TAM1400') {
+          opcoesVersoes = ['Auto', 'Baixo', 'Cafeeiro'];
+        } else if (modeloSelecionado === 'TM1500') {
+          opcoesVersoes = ['Auto Basculante', 'Reduzido Auto ou Baixo', 'Reduzido Fixo', 'Fixo'];
+        } else if (modeloSelecionado === 'TM2200') {
+          opcoesVersoes = ['Reduzida com TDP', 'Reduzida sem TDP'];
+        } else if (modeloSelecionado === 'TM2500') {
+          opcoesVersoes = ['Reduzida com TDP', 'Reduzida sem TDP'];
+        } else if (modeloSelecionado === 'TM3000') {
+          opcoesVersoes = ['Cabinada', 'Coletor de Lixo', 'Reduzida com TDP', 'Reduzida sem TDP', 'Sem Reduzida'];
+        } else if (modeloSelecionado === 'Aparador de Grama') {
+          opcoesVersoes = ['Aparador de Grama'];
+        } else if (modeloSelecionado === 'Carreta Tracionada') {
+          opcoesVersoes = ['Basculante', 'Basculante Baixa Entre Rodas', 'Basculante Baixa Graneleira Cafe', 'Basculante Baixa Graneleira Forrageira', 'Basculante Bananeira', 'Basculante Hidraulica Baixa', 'Basculante Hidraulica Graneleira Cafe', 'Basculante Hidraulico', 'Basculante Manual', 'Basculante Manual Baixa Forrageira', 'Basculante Manual Bananeira', 'Fixa'];
+        } else if (modeloSelecionado === 'Kit Direção') {
+          opcoesVersoes = ['Kit Direção'];
+        } else if (modeloSelecionado === 'Kit Triturador') {
+          opcoesVersoes = ['Kit Triturador'];
+        } else if (modeloSelecionado === 'Roçadeira Frontal') {
+          opcoesVersoes = ['Roçadeira Frontal'];
+        } else if (modeloSelecionado === 'Roçadeira Horizontal') {
+          opcoesVersoes = ['Roçadeira Horizontal'];
+        } else if (modeloSelecionado === 'Carretinha') {
+          opcoesVersoes = ['Carretinha'];
+        } else if (modeloSelecionado === 'Distribuidor Adubo/Sementes') {
+          opcoesVersoes = ['Distribuidor Adubo/Sementes'];
+        } else if (modeloSelecionado === 'Grade de Disco') {
+          opcoesVersoes = ['Grade de Disco'];
+        } else if (modeloSelecionado === 'Lâmina Dianteira') {
+          opcoesVersoes = ['Lâmina Dianteira'];
+        } else if (modeloSelecionado === 'Pulverizador') {
+          opcoesVersoes = ['Pulverizador'];
+        } else if (modeloSelecionado === 'Roçadeira Vertical') {
+          opcoesVersoes = ['Roçadeira Vertical'];
+        } else if (modeloSelecionado === 'Ensiladeira') {
+          opcoesVersoes = ['Ensiladeira'];
+        } else if (modeloSelecionado === 'Triturador de Galhos') {
+          opcoesVersoes = ['Triturador de Galhos'];
+        } else if (modeloSelecionado === 'Peças') {
+          opcoesVersoes = ['Peças'];
+        }
+
+        opcoesVersoes.forEach(function(versao) {
+          const option = document.createElement('option');
+          option.value = versao;
+          option.text = versao;
+          versaoSelect.appendChild(option);
+        });
+      }
+
+      // Função para verificar e exibir/ocultar as flags
+      function verificarExibicaoFlags() {
+        const tipoProduto = tipoProdutoSelect.value;
+        const modeloSelecionado = modeloSelect.value;
+
+        if (tipoProduto === 'Transportador') {
+          flagsGroup.style.display = 'block';
+        } else {
+          flagsGroup.style.display = 'none';
+        }
+
+        if (tipoProduto === 'Implemento Micro Trator' && modeloSelecionado === 'Carreta Tracionada') {
+          flagsGroupC.style.display = 'block';
+        } else {
+          flagsGroupC.style.display = 'none';
+        }
+      }
+
+      tipoProdutoSelect.addEventListener('change', function() {
+        atualizarModelos();
+      });
+
+      modeloSelect.addEventListener('change', function() {
+        atualizarVersoes();
+        verificarExibicaoFlags();
+      });
+
+      atualizarModelos();
+      atualizarVersoes();
+    });
+  </script>
+</body>
+</html>
