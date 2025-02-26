@@ -428,17 +428,6 @@
       cepInput.value = cep.replace(/(\d{5})(\d{3})/, '$1-$2');
     }
 
-    /*// Função para formatar Telefone ao sair do campo
-    function formatarTelefone(telefoneInput) {
-      const telefone = telefoneInput.value.replace(/\D/g, '');
-
-      if (telefone.length <= 10) {
-        telefoneInput.value = telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1)$2-$3');
-      } else {
-        telefoneInput.value = telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1)$2-$3');
-      }
-    }*/
-
     function formatarTelefone(campo) {
       let valor = campo.value.replace(/\D/g, ""); // Remove tudo que não for número
       let erroMsg = document.getElementById("erroTelefone");
